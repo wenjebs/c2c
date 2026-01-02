@@ -16,6 +16,621 @@ C2C (Cafe-to-Cafe) helps users discover and rate cafes based on work-friendly cr
 
 ---
 
+## 🎨 DESIGN SYSTEM (CRITICAL - READ FIRST)
+
+> **IMPORTANT**: All AI assistants MUST follow these design system rules. This ensures consistency, maintainability, and extensibility across the entire codebase.
+
+### Color Palette & Usage
+
+**Configured in `tailwind.config.ts`** - ONLY use these C2C brand colors + default Tailwind neutrals:
+
+#### C2C Brand Colors (ONLY USE THESE FOR BRAND ELEMENTS)
+```typescript
+'c2c-base': '#f6f0e8'         // Warm off-white (page backgrounds, cards)
+'c2c-orange': '#f4512c'        // Primary accent (CTAs, buttons, highlights)
+'c2c-orange-dark': '#e64524'   // Hover/active states for orange elements
+```
+
+#### Allowed Neutral Colors (From Default Tailwind)
+```typescript
+white, black              // Pure white/black
+gray-50 through gray-900  // Gray scale for text, borders, backgrounds
+red-50 through red-700    // Error states only
+green-50 through green-700 // Success states only
+```
+
+#### Semantic Color Rules
+
+**✅ CORRECT Usage:**
+```tsx
+// C2C brand colors for branded elements
+<div className="bg-c2c-base">
+<button className="bg-c2c-orange hover:bg-c2c-orange-dark text-white">
+
+// Neutrals for structure
+<div className="bg-white border-gray-300 text-gray-900">
+<input className="border-gray-400 focus:ring-c2c-orange text-gray-900">
+<p className="text-gray-700">      // Body text
+<span className="text-gray-500">  // Muted text
+```
+
+**❌ INCORRECT Usage:**
+```tsx
+// NEVER use amber, blue, or other Tailwind color scales
+<div className="bg-amber-50">      // ❌ Use bg-c2c-base or bg-white
+<button className="bg-blue-500">   // ❌ Use bg-c2c-orange
+<div className="border-amber-900"> // ❌ Use border-gray-700 or border-gray-900
+<p className="text-amber-900">     // ❌ Use text-gray-900
+
+// NEVER use arbitrary color values
+<div className="bg-[#f6f0e8]">     // ❌ Use bg-c2c-base
+
+// NEVER use deprecated pixel-* colors
+<div className="bg-pixel-cream">   // ❌ DEPRECATED - Use bg-c2c-base
+<div className="text-pixel-dark">  // ❌ DEPRECATED - Use text-gray-900
+```
+
+#### Simplified Color System (Easy to Remember!)
+
+### The 3 Rules
+
+1. **Brand colors** → Only for buttons, highlights, and page backgrounds
+2. **Gray scale** → Everything else (text, borders, backgrounds)
+3. **Semantic colors** → Only for errors (red) and success (green)
+
+---
+
+### Brand Colors (3 total)
+
+```tsx
+bg-c2c-base          // Warm page backgrounds, headers
+bg-c2c-orange        // Primary buttons, CTAs
+hover:bg-c2c-orange-dark  // Hover on orange buttons
+```
+
+---
+
+### Gray Scale (Use these simple rules)
+
+**Backgrounds:**
+```tsx
+bg-white        // Default for cards, modals, inputs
+bg-gray-50      // Subtle hover states
+bg-gray-100     // Disabled backgrounds
+bg-gray-200     // Cancel buttons
+```
+
+**Borders:**
+```tsx
+border-gray-300    // Default light borders (cards, dividers)
+border-gray-400    // Input borders
+border-gray-700    // Secondary button borders
+border-gray-900    // Strong borders (modals, emphasis)
+```
+
+**Text:**
+```tsx
+text-gray-900      // Headings, labels (darkest)
+text-gray-700      // Body text (default)
+text-gray-500      // Muted text (timestamps, placeholders)
+```
+
+---
+
+### Semantic Colors (Errors & Success Only)
+
+**Errors:**
+```tsx
+bg-red-50 border-red-400 text-red-700    // Error messages/states
+```
+
+**Success:**
+```tsx
+bg-green-50 border-green-400 text-green-700  // Success messages/states
+```
+
+---
+
+### Quick Reference Table
+
+| Element | Pattern |
+|---------|---------|
+| **Primary Button** | `bg-c2c-orange hover:bg-c2c-orange-dark text-white` |
+| **Secondary Button** | `bg-white border-gray-700 text-gray-900 hover:bg-gray-100` |
+| **Text Input** | `bg-white border-gray-400 text-gray-900 focus:ring-c2c-orange` |
+| **Card** | `bg-white border-gray-300 text-gray-900 hover:bg-gray-50` |
+| **Modal** | `bg-white border-2 border-gray-900` |
+| **Page Header** | `bg-c2c-base border-b-2 border-gray-300` |
+| **Heading** | `text-gray-900 font-bold` |
+| **Body Text** | `text-gray-700` |
+| **Muted Text** | `text-gray-500` |
+| **Error** | `bg-red-50 border-red-400 text-red-700` |
+| **Success** | `bg-green-50 border-green-400 text-green-700` |
+
+That's it! Everything uses either **c2c-base/orange**, **gray-X**, or **red/green for states**.
+
+### Typography System
+
+**Font Families** (configured in `tailwind.config.ts`):
+```typescript
+font-sans: 'Roboto Mono'   // Default body text
+font-pixel: 'Press Start 2P' // Decorative headings (use sparingly)
+font-mono: 'Roboto Mono'   // Code/numeric displays
+```
+
+**Text Sizes & Hierarchy:**
+```tsx
+// Headings
+<h1 className="text-2xl font-bold text-amber-900">   // Page titles
+<h2 className="text-xl font-bold text-amber-900">    // Section headers
+<h3 className="text-lg font-semibold text-amber-900"> // Subsections
+
+// Body Text
+<p className="text-sm text-amber-800">    // Primary body
+<p className="text-xs text-amber-700">    // Secondary/helper text
+
+// Labels
+<label className="text-sm font-medium text-amber-900"> // Form labels
+```
+
+### Spacing & Layout
+
+**Consistent Spacing Scale:**
+- Use Tailwind's default spacing scale (0.25rem increments)
+- Prefer `space-y-*` and `gap-*` over manual `mb-*` when possible
+- Standard component padding: `p-6` (24px)
+- Card/Panel padding: `p-4` or `p-6`
+- Section spacing: `space-y-4` or `space-y-6`
+
+### Border & Shadow System
+
+**Borders:**
+```tsx
+// Standard borders
+border           // 1px solid
+border-2         // 2px solid (preferred for emphasis)
+border-3         // 3px solid (strong emphasis)
+border-4         // 4px solid (pixel art aesthetic)
+
+// Border radius - AVOID rounded corners for pixel art elements
+rounded-none     // For pixel art components (preferred)
+rounded-lg       // Only for modern UI elements (modals, inputs)
+```
+
+**Shadows:**
+```typescript
+// Custom pixel-art shadows (in tailwind.config.ts)
+shadow-pixel:    '4px 4px 0 rgba(90, 74, 66, 0.15), 8px 8px 0 rgba(212, 130, 63, 0.1)'
+shadow-pixel-sm: '2px 2px 0 rgba(90, 74, 66, 0.15), 4px 4px 0 rgba(212, 130, 63, 0.1)'
+```
+
+---
+
+## 🧩 COMPONENT ARCHITECTURE RULES
+
+### Component Design Principles
+
+**1. Modularity & Reusability**
+- ✅ Create small, single-responsibility components
+- ✅ Use props for configuration, not duplication
+- ✅ Extract common patterns into `/components/ui`
+- ❌ NEVER copy-paste components with slight variations
+
+**2. Component Structure**
+```
+components/
+├── ui/              # Reusable primitives (Button, Input, Modal)
+├── map/             # Map-specific components
+├── cafe/            # Cafe-related features
+├── auth/            # Authentication components
+└── layout/          # Layout components (Header, Footer)
+```
+
+### Standard Component Template
+
+```tsx
+'use client'; // Only when needed (interactivity, hooks, browser APIs)
+
+import React from 'react';
+import { ComponentProps } from '@/types'; // If custom types needed
+
+/**
+ * Component description
+ * @param prop1 - Description
+ * @param prop2 - Description
+ */
+export interface MyComponentProps {
+  variant?: 'primary' | 'secondary';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string; // Always allow className override
+  children?: React.ReactNode;
+  // ... other props
+}
+
+export function MyComponent({
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  children,
+  ...props
+}: MyComponentProps) {
+  // Component logic here
+
+  return (
+    <div className={`base-styles ${variantStyles[variant]} ${className}`} {...props}>
+      {children}
+    </div>
+  );
+}
+```
+
+### UI Component Requirements
+
+**All UI components MUST:**
+1. **Accept `className` prop** for style overrides
+2. **Use C2C color palette** (see Color System above - c2c-* colors + gray neutrals)
+3. **Support disabled states** with `disabled:opacity-50 disabled:cursor-not-allowed`
+4. **Include TypeScript interfaces** for all props
+5. **Spread `...props`** to support native HTML attributes
+6. **Use controlled/uncontrolled patterns** appropriately
+
+**Example: Button Component Pattern**
+```tsx
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export function Button({ variant = 'primary', className = '', ...props }: ButtonProps) {
+  const baseStyles = 'font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+
+  const variantStyles = {
+    primary: 'bg-c2c-orange text-white hover:bg-c2c-orange-dark',
+    secondary: 'bg-white text-gray-900 hover:bg-gray-100 border border-gray-700',
+    danger: 'bg-red-600 text-white hover:bg-red-700',
+  };
+
+  return (
+    <button className={`${baseStyles} ${variantStyles[variant]} ${className}`} {...props} />
+  );
+}
+```
+
+---
+
+## 🪝 HOOKS ARCHITECTURE
+
+### Hook Organization
+
+```
+hooks/
+├── useOnboarding.ts    # Auth-related navigation logic
+├── useCafeSearch.ts    # (Future) Cafe search state management
+└── useGeolocation.ts   # (Future) GPS handling
+```
+
+### Hook Design Rules
+
+**✅ Good Hook Practices:**
+```tsx
+/**
+ * Hook for X functionality
+ * @returns { value, isLoading, error }
+ */
+export function useMyFeature() {
+  const [value, setValue] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Logic here
+
+  return {
+    value,      // Data
+    isLoading,  // Loading state
+    error,      // Error state
+    refetch,    // Action methods
+  };
+}
+```
+
+**❌ Bad Hook Practices:**
+```tsx
+// ❌ Don't return arrays (not self-documenting)
+return [value, setValue]; // Use object instead
+
+// ❌ Don't violate Rules of Hooks
+if (condition) useEffect(...); // Conditional hooks
+
+// ❌ Don't create mega-hooks that do everything
+// Keep hooks focused on single responsibility
+```
+
+### Context Pattern (AuthContext Example)
+
+```tsx
+'use client';
+
+import { createContext, useContext } from 'react';
+
+interface MyContextType {
+  value: string;
+  setValue: (val: string) => void;
+}
+
+const MyContext = createContext<MyContextType | undefined>(undefined);
+
+export function MyProvider({ children }: { children: React.ReactNode }) {
+  // State management
+  return <MyContext.Provider value={value}>{children}</MyContext.Provider>;
+}
+
+export function useMyContext() {
+  const context = useContext(MyContext);
+  if (!context) throw new Error('useMyContext must be used within MyProvider');
+  return context;
+}
+```
+
+---
+
+## 📦 STATE MANAGEMENT PATTERNS
+
+### Client State (useState, useReducer)
+- Component-local state (form inputs, UI toggles)
+- Temporary selections (selected cafe, expanded card)
+
+### Context State (React Context)
+- Global auth state (`AuthContext`)
+- Theme/settings (if implemented)
+- User profile data
+
+### Server State (Future: React Query / SWR)
+- Cafe data fetching
+- Rating submissions
+- Search results
+
+**Rule:** Keep state as local as possible. Only lift to Context when 3+ components need it.
+
+---
+
+## 🎯 STYLING GUIDELINES
+
+### Tailwind CSS Rules
+
+**✅ DO:**
+- Use Tailwind utility classes for ALL styling
+- Group related utilities: `className="flex items-center gap-2"`
+- Use C2C color tokens: `c2c-base`, `c2c-orange`, `c2c-orange-dark` + gray neutrals
+- Extract repeated patterns into components
+
+**❌ DON'T:**
+- Write custom CSS files (except globals.css for fonts/resets)
+- Use inline `style={{}}` unless dynamic values required
+- Use arbitrary values `[#hex]` - add to tailwind.config.ts instead
+- Mix Tailwind with CSS modules
+- Use amber, blue, or deprecated pixel-* color scales
+
+### Conditional Styling Pattern
+
+```tsx
+// ✅ Good - using template literals
+<div className={`base-class ${isActive ? 'bg-gray-100' : 'bg-white'}`} />
+
+// ✅ Better - using clsx/cn helper (if available)
+import { cn } from '@/lib/utils';
+<div className={cn('base-class', isActive && 'bg-gray-100')} />
+
+// ❌ Bad - inline styles
+<div style={{ background: isActive ? '#f3f4f6' : '#fff' }} />
+
+// ❌ Bad - deprecated colors
+<div className={`base-class ${isActive ? 'bg-amber-100' : 'bg-white'}`} />
+```
+
+---
+
+## 🖼️ IMAGE & ASSET RULES
+
+### Pixel Art Assets
+
+**Location:** `/public/assets/`
+
+**Usage:**
+```tsx
+import Image from 'next/image';
+
+<Image
+  src="/assets/coffee.png"
+  alt="Coffee icon"
+  width={24}
+  height={24}
+  unoptimized // REQUIRED for pixel art to prevent blur
+  className="pixel-image" // Maintains sharp edges
+/>
+```
+
+**Naming Convention:**
+- Use kebab-case: `coffee-icon.png`
+- Descriptive names: `full_star.png`, `half_star.png`, `zero_star.png`
+- Group by category if needed: `icons/`, `stars/`
+
+---
+
+## 🔒 TYPESCRIPT RULES
+
+### Type Safety Standards
+
+**✅ ALWAYS:**
+```tsx
+// Define interfaces for all component props
+export interface MyProps {
+  name: string;
+  count?: number; // Optional props with ?
+}
+
+// Use type imports
+import type { User } from '@supabase/supabase-js';
+
+// Type event handlers
+const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => { };
+```
+
+**❌ NEVER:**
+```tsx
+// Don't use `any`
+const data: any = fetchData(); // ❌
+
+// Don't skip prop types
+export function Component(props) { } // ❌
+
+// Don't use `as` to bypass types (unless absolutely necessary)
+const user = data as User; // ⚠️ Only when type narrowing impossible
+```
+
+### Database Type Pattern
+
+```tsx
+// lib/supabase.ts
+export interface Cafe {
+  id: string;
+  name: string;
+  location: { lat: number; lng: number };
+  // ... other fields
+}
+
+export interface Rating {
+  id: string;
+  cafe_id: string;
+  user_id: string;
+  overall_rating: number;
+  // ... other fields
+}
+```
+
+---
+
+## 📁 FILE & FOLDER CONVENTIONS
+
+### Naming Rules
+
+- **Components:** PascalCase (`MyComponent.tsx`)
+- **Hooks:** camelCase with `use` prefix (`useMyHook.ts`)
+- **Utils:** camelCase (`formatDate.ts`)
+- **Types:** PascalCase (`CafeTypes.ts` or `types/cafe.ts`)
+- **Constants:** SCREAMING_SNAKE_CASE in `constants.ts`
+
+### Import Order
+
+```tsx
+// 1. External dependencies
+import React, { useState } from 'react';
+import { User } from '@supabase/supabase-js';
+
+// 2. Internal components
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/auth/Modal';
+
+// 3. Utilities & hooks
+import { formatDate } from '@/lib/utils';
+import { useAuth } from '@/lib/auth/AuthContext';
+
+// 4. Types
+import type { Cafe } from '@/types/cafe';
+
+// 5. Styles/assets (if any)
+import '/styles/custom.css';
+```
+
+---
+
+## ⚡ PERFORMANCE RULES
+
+1. **Use `'use client'` sparingly** - Default to Server Components
+2. **Lazy load heavy components:**
+   ```tsx
+   const MapView = dynamic(() => import('@/components/map/MapView'), { ssr: false });
+   ```
+3. **Memoize expensive calculations:**
+   ```tsx
+   const sortedCafes = useMemo(() => cafes.sort(...), [cafes]);
+   ```
+4. **Debounce search inputs** (use `useDebounce` hook)
+5. **Optimize images** with Next.js `<Image>` (except pixel art - use `unoptimized`)
+
+---
+
+## 🚨 CRITICAL ERRORS TO AVOID
+
+### 1. Color Inconsistency
+```tsx
+// ❌ WRONG - uses deprecated/non-standard colors
+<div className="bg-amber-50 border-amber-900 text-amber-900">
+<button className="bg-blue-500">
+<div className="bg-pixel-cream border-pixel-dark">  // DEPRECATED
+
+// ✅ CORRECT - uses C2C palette + gray neutrals
+<div className="bg-c2c-base border-gray-300 text-gray-900">
+<button className="bg-c2c-orange hover:bg-c2c-orange-dark text-white">
+<div className="bg-white border-gray-400 text-gray-700">
+```
+
+### 2. Hardcoded Values
+```tsx
+// ❌ WRONG
+const API_URL = 'https://api.example.com';
+const MAX_RATING = 5;
+
+// ✅ CORRECT - use env vars or constants
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const MAX_RATING = 5 as const; // Type-safe constant
+```
+
+### 3. Props Drilling (3+ Levels)
+```tsx
+// ❌ WRONG - passing props through 5 components
+<A data={x} /> → <B data={x} /> → <C data={x} />
+
+// ✅ CORRECT - use Context or component composition
+<DataProvider value={x}>
+  <C />
+</DataProvider>
+```
+
+### 4. Missing Error States
+```tsx
+// ❌ WRONG - no error handling
+const data = await fetchCafes();
+
+// ✅ CORRECT - handle errors
+try {
+  const data = await fetchCafes();
+} catch (error) {
+  console.error('Failed to fetch cafes:', error);
+  setError('Unable to load cafes. Please try again.');
+}
+```
+
+---
+
+## 📝 CODE REVIEW CHECKLIST
+
+Before submitting any code, verify:
+
+- [ ] Uses ONLY C2C colors (`c2c-base`, `c2c-orange`, `c2c-orange-dark`) + gray neutrals
+- [ ] NO deprecated colors (amber-*, pixel-*, blue-*, etc.)
+- [ ] Component has TypeScript interface
+- [ ] `className` prop forwarded for extensibility
+- [ ] No hardcoded colors/sizes (uses Tailwind tokens)
+- [ ] Follows import order convention
+- [ ] Includes error handling for async operations
+- [ ] Uses `'use client'` only when needed
+- [ ] Pixel art images use `unoptimized` flag
+- [ ] Accessible (aria-labels, keyboard navigation)
+- [ ] Mobile-responsive (tested on small screens)
+
+---
+
 ## Technology Stack
 
 ### Frontend
